@@ -1,4 +1,4 @@
-import App, { IApp } from '../models/app';
+import { IApp } from '../models/app';
 import Router from 'koa-router';
 import * as KoaPassport from 'koa-passport';
 import { DefaultState, Context } from 'koa';
@@ -39,6 +39,7 @@ const appAuth = function (router: Router<DefaultState, Context>, passport: typeo
       }
     })(ctx, next);
   });
+  
   return router;
 };
 export default appAuth;

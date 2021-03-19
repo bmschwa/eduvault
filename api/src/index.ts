@@ -1,6 +1,5 @@
 /** Provides nodejs access to a global Websocket value, required by Hub API */
 (global as any).WebSocket = require('isomorphic-ws');
-import mongoose from 'mongoose';
 import Koa from 'koa';
 import cors from '@koa/cors';
 import cookie from 'koa-cookie';
@@ -12,33 +11,18 @@ import helmet from 'koa-helmet';
 import websockify from 'koa-websocket';
 import ip from 'ip';
 
-import connectDB from './mongo/mongoose';
+import { newLocalDB } from './textile/helpers';
 import passportInit from './auth/passportInit';
-import startRouter from './routes';
+import routerInit from './routes';
 import personAuthRoute from './routes/wssPersonAuthRoute';
 import { config, CORS_CONFIG } from './config';
 import { utils } from './utils';
+// import { appSchema } from './models/app';
+// import { personSchema } from './models/person';
 const app = websockify(new Koa());
-
-if (utils.isProdEnv()) app.proxy = true;
-
-/** Database */
-if (process.env.TEST !== 'true') connectDB();
-
-// delete collections
-let del = false;
-// let del = true;
-if (del)
-  try {
-    mongoose.connection.collections['person'].drop(function (err: any) {
-      console.log('+++++1person collection dropped++++', err);
-    });
-    mongoose.connection.collections['app'].drop(function (err: any) {
-      console.log('+++++1app collection dropped++++', err);
-    });
-  } catch (error) {
-    console.log({ error });
-  }
+app.proxy = true;
+const { isProdEnv } = utils;
+if (isProdEnv()) app.proxy = true;
 
 /** Middlewares */
 app.use(async function handleGeneralError(ctx, next) {
@@ -50,7 +34,7 @@ app.use(async function handleGeneralError(ctx, next) {
   }
 });
 app.use(cors(CORS_CONFIG));
-if (utils.isProdEnv()) app.use(sslify({ resolver: xForwardedProtoResolver }));
+if (isProdEnv()) app.use(sslify({ resolver: xForwardedProtoResolver }));
 app.use(cookie());
 app.use(logger());
 app.use(bodyParser());
@@ -67,21 +51,28 @@ app.use(
   }),
 );
 
-/** Passport */
-const passport = passportInit(app);
-
-/** Routes */
-const router = startRouter(app, passport);
-/** Websockets */
-personAuthRoute(app);
-
 const testAPI = app;
-export { testAPI };
+export { testAPI, newLocalDB, passportInit, routerInit, personAuthRoute };
 
-if (process.env.TEST !== 'true')
+if (process.env.TEST !== 'true') {
   /** Start the server! */
-  app.listen(config.PORT_API, () =>
-    console.log(`Koa server listening at ${ip.address()}:${config.PORT_API}`),
-  );
+  app.listen(config.PORT_API, async () => {
+    /** Database */
+    const db = await newLocalDB('eduvault-api');
+    if ('error' in db) {
+      console.log('error loading db');
+      return;
+    }
+
+    /** Passport */
+    const passport = passportInit(app, db);
+    /** Routes */
+    routerInit(app, passport, db);
+    /** Websockets */
+    personAuthRoute(app, db);
+
+    console.log(`Koa server listening at ${ip.address()}:${config.PORT_API}`);
+  });
+}
 
 export default app;

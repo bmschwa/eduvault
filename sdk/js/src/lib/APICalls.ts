@@ -1,5 +1,6 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import { ROUTES, URL_API } from '../config';
+
+import { HOST, ROUTES, URL_API } from '../config';
 import { types } from '../types';
 import { utils } from '../utils';
 const hash = utils.hash;
@@ -10,7 +11,7 @@ type AppRegisterReq = types.AppRegisterReq;
 type PasswordLoginReq = types.PasswordLoginReq;
 
 export const personRegister = async (options: {
-  accountID: string | undefined;
+  username: string | undefined;
   password: string | undefined;
   redirectURL?: string | undefined;
   appID?: string | undefined;
@@ -27,6 +28,8 @@ export const personRegister = async (options: {
       },
       data: postData,
       method: 'POST',
+      baseURL: HOST,
+      proxy: false,
     };
     const res = await axios(axiosOptions);
     const resData: types.PasswordLoginRes = res.data;
@@ -59,9 +62,29 @@ export const devVerify = async (appSecret: string, devID: string) => {
     return null;
   }
 };
-
+export const clearCollections = async (appSecret: string) => {
+  try {
+    const postData = { appSecret };
+    const options: AxiosRequestConfig = {
+      url: URL_API + '/drop-collections',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Forwarded-Proto': 'https',
+      },
+      data: postData,
+      method: 'POST',
+    };
+    const res = await axios(options);
+    const resData = res.data;
+    console.log('drop database data', resData);
+    return resData;
+  } catch (error) {
+    console.log({ error });
+    return null;
+  }
+};
 export const appRegister = async (
-  accountID: string,
+  username: string,
   password: string,
   name: string,
   description?: string,
@@ -69,7 +92,7 @@ export const appRegister = async (
 ) => {
   try {
     const postData: AppRegisterReq = {
-      accountID,
+      username,
       password: hash(password),
       name,
       description,

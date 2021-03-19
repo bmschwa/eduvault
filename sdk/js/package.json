@@ -1,7 +1,7 @@
 {
   "name": "@eduvault/eduvault-js",
-  "version": "1.1.0",
-  "description": "asdf",
+  "version": "1.2.0",
+  "description": "An SDK that allows app creators to quickly create and authenticate a user-owned database",
   "main": "dist/main/index.js",
   "typings": "dist/main/index.d.ts",
   "module": "dist/module/index.js",
@@ -28,15 +28,19 @@
     "node": ">=10"
   },
   "dependencies": {
+    "@eduvault/shared": "^1.1.25",
     "@textile/hub": "^6.0.2",
     "@textile/threaddb": "^0.0.6",
+    "@types/lodash": "^4.14.168",
     "axios": "^0.21.1",
     "buffer": "^6.0.3",
     "core-js": "^3.8.3",
     "core-js-bundle": "^3.8.3",
     "crypto-js": "^4.0.0",
     "google-protobuf": "^3.15.0-rc.1",
+    "lodash": "^4.17.21",
     "node-fetch": "^2.6.1",
+    "sqlite3": "^5.0.2",
     "ulid": "^2.3.0"
   },
   "devDependencies": {

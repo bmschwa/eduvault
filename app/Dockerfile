@@ -1,4 +1,4 @@
-FROM node:14 AS build-stage
+FROM node:12 AS build-stage
 # RUN apk update
 # RUN apk add git
 WORKDIR /app
@@ -16,6 +16,6 @@ COPY . .
 FROM build-stage AS dev-stage
 
 # npm kept failing here, so using yarn
-RUN yarn global add @vue/cli
+# RUN yarn global add @vue/cli
 EXPOSE 8081
 CMD [ "yarn", "dev" ]
