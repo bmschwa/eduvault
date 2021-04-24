@@ -158,12 +158,15 @@ yarn dev-build:build
 
 You will also need the mkcert certs mentioned above.
 
-### Porduction deploy
+### Production deploy
 
 Change the .env PROD_HOST to the staging/production server host name (e.g. staging-site.com)
 change the host name in the make-dev-certs or make-prd-certs script and run it and copy the certs
 
 You can use the `dev-build` build for staging on your local machine or on the server.
+
+
+yarn build
 
 deploy:
 
@@ -186,4 +189,15 @@ yarn d-build # build docker images. Can skip if already built.
 screen # to continue running
 yarn production # runs in detached mode. remove the -d for logs
 # ctrl a d  to quit screen
+```
+
+
+
+---- 
+How I did it: 
+
+```shell
+docker inst
+# then into each subfolder & do a docker
+docker build -f ./Dockerfile_prod  -t eduvault_example:c97628e -t eduvault_example:latest .
 ```
