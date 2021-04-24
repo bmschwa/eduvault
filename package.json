@@ -12,7 +12,9 @@
     "rimraf": "^3.0.2",
     "typescript": "^4.1.3"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@eduvault/shared": "^1.1.30"
+  },
   "scripts": {
     "link-local-nginx-conf": "ln deploy/nginx/local/app.conf /usr/local/Homebrew/etc/nginx/servers/app.conf",
     "copy-dev-certs": "mkdir /usr/local/Homebrew/etc/dev-certs && cp -r deploy/dev-certs /usr/local/Homebrew/etc/",
