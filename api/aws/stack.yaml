@@ -1,0 +1,256 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Brings up an inexpensive computer to work with w volume mounted
+Parameters:
+  DefaultEbsKey:
+    Description: Default Key for EBS encryption
+    Type: String
+    Default: 7b4427a5-a6ac-4ffa-8373-04f9631eb982
+Resources:
+  StackSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    DeletionPolicy: Retain
+    Properties:
+      GroupDescription: ssh access
+      SecurityGroupIngress:
+        - CidrIp: 0.0.0.0/0
+          FromPort: 22
+          IpProtocol: tcp
+          ToPort: 22
+      Tags:
+        - Key: UsedBy
+          Value:
+            Fn::Sub: ${AWS::StackName}
+  SpotInstanceLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    DependsOn:
+      - SpotInstanceProfile
+      - StackSecurityGroup
+    Properties:
+      LaunchTemplateName:
+        Fn::Sub: SpotInstanceLaunchTemplate-${AWS::StackName}
+      LaunchTemplateData:
+        UserData:
+          Fn::Base64:
+            Fn::Sub: "#cloud-config\nrepo_update: true\nrepo_upgrade: all\n\npackages:\n\
+              \ - httpd\n - emacs\n - htop\n - libssl-dev\n - htop\n - git\n - lynx\n\
+              \ - ntp\n - scrub\n - mysql\n - xfsprogs\n - jq\n\nwrite_files:\n -\
+              \ content: |\n    # See https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-agent-config.html\n\
+              \    ECS_CLUSTER=myFirstCluster\n    ECS_LOGLEVEL=debug\n    ECS_UPDATES_ENABLED=true\n\
+              \   path: /etc/ecs/ecs.config\n   owner: root:root\n   permissions:\
+              \ '0644'\n\nruncmd:\n - echo \"********* RUNNING MY COMMANDS *************\
+              \ $(whoami) @ $(pwd)\"\\\n - yum install -y https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm\n\
+              \ - yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm\n\
+              \ - amazon-cloudwatch-agent-ctl -a start\n - yum -y groupinstall \"\
+              Development Tools\"\n - amazon-linux-extras disable docker\n - yum remove\
+              \ -y --quiet docker\n - amazon-linux-extras install -y ecs python3.8\n\
+              \ - curl -s https://raw.githubusercontent.com/bmschwa/aws-ec2-ssh/3771fe6ba4c5738e1d6a6b84dd282a303cfde838/install.sh\
+              \ --output /tmp/install_aws_ec2_ssh.sh\n - chmod 755 /tmp/install_aws_ec2_ssh.sh\
+              \ && /tmp/install_aws_ec2_ssh.sh -i linux-users -s super-linux-users\
+              \ -l docker,users\n - ln -s  /usr/bin/python3.8 /usr/bin/python3\n -\
+              \ gpg --recv-keys 36C2E964 7809386C 066DAFCB81E42C40 34FA74DD --keyserver\n\
+              \ - sudo rpm -v --import https://repo.nordvpn.com/gpg/nordvpn_public.asc\n\
+              \ - curl -s https://repo.nordvpn.com/yum/nordvpn/centos/noarch/Packages/n/nordvpn-release-1.0.0-1.noarch.rpm\
+              \ --output /tmp/nord.rpm | sudo yum -y install /tmp/nord.rpm\n - curl\
+              \ -sL https://rpm.nodesource.com/setup_12.x | bash - | yum install -y\
+              \ nodejs\n - curl -s https://bootstrap.pypa.io/get-pip.py | python3\n\
+              \ - pip3 install virtualenv virtualenvwrapper git-remote-codecommit\n\
+              \ - service ntpd start | chkconfig ntpd on\n - git config --system credential.helper\
+              \ '!aws codecommit credential-helper $@' && sudo git config --system\
+              \ credential.UseHttpPath true\n - git clone --quiet https://git-codecommit.us-west-2.amazonaws.com/v1/repos/cloud_infrastructure\
+              \ /usr/src/cloud_infrastructure && chown -R :iam-synced-users /usr/src/cloud_infrastructure/\
+              \ && chmod -R 775 /usr/src/cloud_infrastructure/\n - ln -s /usr/src/cloud_infrastructure/env_config/system/update_profile_global.sh\
+              \ /etc/profile.d\n - systemctl enable --now --no-block ecs\n - systemctl\
+              \ enable --now amazon-ssm-agent && systemctl restart amazon-ssm-agent\n\
+              \ - systemctl enable --now ntpd && systemctl restart ntpd\n - npm install\
+              \ --global yarn\n - chmod u+s $(which screen)\n - chmod 755 /var/run/screen\n\
+              \ - curl -s http://localhost:51678/v1/metadata | jq\n"
+        InstanceMarketOptions:
+          SpotOptions:
+            SpotInstanceType: one-time
+            ValidUntil: '2021-04-16T03:27:10.402110'
+          MarketType: spot
+        SecurityGroups:
+          - Ref: StackSecurityGroup
+        ImageId: ami-0518bb0e75d3619ca
+        BlockDeviceMappings:
+          - DeviceName: /dev/xvda
+            Ebs:
+              Encrypted: true
+              KmsKeyId: 39841122-5da8-4404-9d4c-af6cd9168d41
+              DeleteOnTermination: true
+              VolumeType: gp2
+              VolumeSize: 8
+        KeyName: schwartz_win_10
+        EbsOptimized: true
+        IamInstanceProfile:
+          Arn:
+            Fn::GetAtt:
+              - SpotInstanceProfile
+              - Arn
+        TagSpecifications:
+          - ResourceType: instance
+            Tags:
+              - Key: Name
+                Value: StackedSpotInstance
+              - Key: UsedBy
+                Value:
+                  Fn::Sub: ${AWS::StackName}
+          - ResourceType: volume
+            Tags:
+              - Key: Name
+                Value: StackedSpotInstance
+              - Key: UsedBy
+                Value:
+                  Fn::Sub: ${AWS::StackName}
+  SpotFleetRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - spotfleet.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetTaggingRole
+  SpotRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+  SessionManagerPermissionsPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: SessionManagerPermissionsPolicy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Action:
+              - kms:Decrypt
+            Effect: Allow
+            Resource:
+              Fn::Sub: arn:aws:kms:${AWS::Region}:404117053359:key/*
+          - Effect: Allow
+            Resource: '*'
+            Action:
+              - ssmmessages:CreateDataChannel
+              - s3:GetEncryptionConfiguration
+              - ssmmessages:OpenDataChannel
+              - ssmmessages:OpenControlChannel
+              - ssmmessages:CreateControlChannel
+      Roles:
+        - Ref: SpotRole
+  LooseEC2LoggingPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: LooseEC2LoggingPolicy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+              - logs:DescribeLogStreams
+              - cloudwatch:PutMetricData
+            Effect: Allow
+            Resource: '*'
+      Roles:
+        - Ref: SpotRole
+        - Ref: SpotFleetRole
+  SpotInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    DependsOn:
+      - SpotRole
+    Properties:
+      Path: /
+      Roles:
+        - Ref: SpotRole
+  AWSEC2Policy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: AWSSSHEC2
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - iam:ListUsers
+              - iam:GetGroup
+            Resource: '*'
+          - Effect: Allow
+            Action:
+              - iam:GetSSHPublicKey
+              - iam:ListSSHPublicKeys
+            Resource:
+              - arn:aws:iam::*:user/*
+          - Effect: Allow
+            Action: ec2:DescribeTags
+            Resource: '*'
+      Roles:
+        - Ref: SpotRole
+  ROClonePolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: ReadOnlyClonePolicy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - codecommit:BatchGet*
+              - codecommit:BatchDescribe*
+              - codecommit:EvaluatePullRequestApprovalRules
+              - codecommit:Get*
+              - codecommit:List*
+              - codecommit:GitPull
+            Resource:
+              Fn::Sub: arn:aws:codecommit:us-west-2:${AWS::AccountId}:cloud_infrastructure
+      Roles:
+        - Ref: SpotRole
+  MySpotRequest:
+    Type: AWS::EC2::SpotFleet
+    DependsOn:
+      - SpotInstanceLaunchTemplate
+    Properties:
+      SpotFleetRequestConfigData:
+        IamFleetRole:
+          Fn::GetAtt:
+            - SpotFleetRole
+            - Arn
+        AllocationStrategy: capacityOptimized
+        ValidFrom: '2021-04-15T23:27:10.402110'
+        ValidUntil: '2021-04-17T05:27:10.402110'
+        TerminateInstancesWithExpiration: true
+        LaunchSpecifications: []
+        Type: maintain
+        TargetCapacity: 1
+        LaunchTemplateConfigs:
+          - LaunchTemplateSpecification:
+              LaunchTemplateName:
+                Fn::Sub: SpotInstanceLaunchTemplate-${AWS::StackName}
+              Version:
+                Fn::GetAtt:
+                  - SpotInstanceLaunchTemplate
+                  - LatestVersionNumber
+            Overrides:
+              - InstanceType: c1.medium
+                SubnetId: subnet-e3bc7cbe
+                SpotPrice: '0.014'
+        SpotMaxTotalPrice: '0.017'
+        OnDemandTargetCapacity: 0
