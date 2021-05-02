@@ -37,3 +37,22 @@ make dev
 ```
 
 > server will be available on `localhost:<The port number you used in .env file>` eg. `localhost:3003`
+
+-----
+My build notes
+```
+rm -rf dist
+yarn cache clean
+yarn install
+yarn build:server
+
+// Then you should be able to execute
+// node dist/
+
+// But we want to build a docker image
+
+```
+
+
+docker build -f .\Dockerfile_prod -t eduvault/api:latest -t eduvault/api:$(git log -1 --pretty="format:%h")
+docker push -a eduvault/api

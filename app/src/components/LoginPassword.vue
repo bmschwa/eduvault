@@ -2,8 +2,8 @@
   <b-form inline class="login-component__body form" style="margin: 0" @submit.stop.prevent>
     <label class="sr-only" for="feedback-email">Email</label>
     <b-form-input
-      class="form__input form__item"
       v-model="state.email"
+      class="form__input form__item"
       :state="emailValidation"
       type="email"
       autocomplete="username"
@@ -24,8 +24,8 @@
 
     <label class="sr-only" for="feedback-password">Password</label>
     <b-form-input
-      class="form__input form__item"
       v-model="state.password"
+      class="form__input form__item"
       :state="passwordValidation"
       placeholder="Password"
       type="password"

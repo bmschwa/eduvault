@@ -8,24 +8,30 @@ import facebook from './facebook';
 import google from './google';
 import dotwallet from './dotwallet';
 import checkAuth from '../utils/checkAuth';
+import { DefaultState, Context, ParameterizedContext } from 'koa';
+
 import appAuth from './appAuth';
 import appManage from './appManage';
-import { DefaultState, Context } from 'koa';
 import getPerson from '../utils/getPersonFromSession';
 import { APP_SECRET } from '../config';
 import { utils } from '../utils';
 import { clearCollections } from '../utils/clearCollections';
 import { Database } from '@textile/threaddb';
+
 const routerInit = (
   app: websockify.App<Koa.DefaultState, Koa.DefaultContext>,
   passport: typeof KoaPassport,
   db: Database,
 ) => {
   const router = new Router<DefaultState, Context>();
-  router.get('/ping', async (ctx) => {
-    console.log('pingged');
+
+
+  router.get('/ping', async (ctx: ParameterizedContext) => {
+    console.log('pinged by '+ typeof ctx + JSON.stringify(ctx));
     ctx.oK(null, 'pong!');
   });
+
+
   /** Get Person and JWT */
   router.get('/get-person', checkAuth, async (ctx) => {
     // console.log('++++++++++++++++++get person+++++++++++++++++++');
@@ -38,6 +44,7 @@ const routerInit = (
       ctx.internalServerError('person not found');
     }
   });
+
   router.get('/get-jwt', checkAuth, async (ctx) => {
     ctx.oK({
       jwt: ctx.session.jwt,
@@ -49,7 +56,12 @@ const routerInit = (
     ctx.logout();
     ctx.oK();
   });
-  router.get('/auth-check', checkAuth, (ctx) => {
+
+  router.get('/auth-check', checkAuth, (ctx: ParameterizedContext) => {
+    ctx.oK(null, 'ok');
+  });
+
+  router.get('/health-check', (ctx: ParameterizedContext) => {
     ctx.oK(null, 'ok');
   });
 

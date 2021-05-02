@@ -1,5 +1,5 @@
 <template>
-  <div @click="login()" class="login-component__body mb-1">
+  <div class="login-component__body mb-1" @click="login()">
     <dotwallet-login :app-id="dotwalletAppId" :redirect-url="dotwalletRedirectUrl">
       <img
         class="oauth-login-button"

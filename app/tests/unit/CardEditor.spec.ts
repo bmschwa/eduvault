@@ -14,7 +14,7 @@ import {
 } from '@fortawesome/vue-fontawesome';
 const localVue = createLocalVue();
 library.add(faTrashAlt, faPlusSquare, faCheck, faEdit, faTimes);
-localVue.component('fontAwesomeIcon', FontAwesomeIcon);
+localVue.component('FontAwesomeIcon', FontAwesomeIcon);
 
 describe('CardEditor.vue', () => {
   let frontInput: any;

@@ -14,7 +14,7 @@ import {
 } from '@fortawesome/vue-fontawesome';
 const localVue = createLocalVue();
 library.add(faTrashAlt, faPlusSquare, faCheck, faEdit, faTimes);
-localVue.component('fontAwesomeIcon', FontAwesomeIcon);
+localVue.component('FontAwesomeIcon', FontAwesomeIcon);
 
 describe('CardImport.Vue', () => {
   const wrapper = mount(CardInput, {
@@ -36,15 +36,9 @@ describe('CardImport.Vue', () => {
     expect(buttons).toHaveLength(1);
   });
   it('updates changed text', () => {
-    wrapper
-      .findAll('.card-input .form__text-input')
-      .at(0)
-      .setValue('value1');
+    wrapper.findAll('.card-input .form__text-input').at(0).setValue('value1');
     expect(wrapper.vm.frontText).toBe('value1');
-    wrapper
-      .findAll('.card-input .form__text-input')
-      .at(1)
-      .setValue('value2');
+    wrapper.findAll('.card-input .form__text-input').at(1).setValue('value2');
     expect(wrapper.vm.backText).toBe('value2');
   });
   it('displays selected deck', async () => {
@@ -74,14 +68,8 @@ describe('CardImport.Vue', () => {
   });
   it('when add button clicked, emits addCard with correct data', async () => {
     await wrapper.find('.card-input__add-icon').trigger('click');
-    wrapper
-      .findAll('.card-input .form__text-input')
-      .at(0)
-      .setValue('value1');
-    wrapper
-      .findAll('.card-input .form__text-input')
-      .at(1)
-      .setValue('value2');
+    wrapper.findAll('.card-input .form__text-input').at(0).setValue('value1');
+    wrapper.findAll('.card-input .form__text-input').at(1).setValue('value2');
     const expectedOutput = { frontText: 'value1', backText: 'value2' };
     expect(JSON.stringify(wrapper.emitted().addCard[0][0])).toBe(JSON.stringify(expectedOutput));
   });

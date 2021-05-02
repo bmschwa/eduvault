@@ -61,7 +61,7 @@ import LoginGoogle from '../components/LoginGoogle.vue';
 import LoginFacebook from '../components/LoginFacebook.vue';
 import LoginMetamask from '../components/LoginMetamask.vue';
 // import LoginDotwallet from '../components/LoginDotwallet.vue';
-import router from '../router';
+// import router from '../router';
 import store from '../store';
 interface State {
   homePageLink: string;

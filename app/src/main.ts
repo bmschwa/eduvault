@@ -21,8 +21,8 @@ import {
 import { FontAwesomeIcon, FontAwesomeLayers } from '@fortawesome/vue-fontawesome';
 library.add(faTrashAlt, faPlusSquare, faCheck, faEdit, faTimes, faSpinner, faSync, faCloud);
 
-Vue.component('font-awesome-icon', FontAwesomeIcon);
-Vue.component('font-awesome-layers', FontAwesomeLayers);
+Vue.component('FontAwesomeIcon', FontAwesomeIcon);
+Vue.component('FontAwesomeLayers', FontAwesomeLayers);
 Vue.config.productionTip = false;
 
 import VueCompositionApi from '@vue/composition-api';

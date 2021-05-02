@@ -3,6 +3,7 @@ FROM node:12 AS build-stage
 WORKDIR /app
 COPY package.json ./
 COPY yarn.lock ./
+COPY nginx.conf ./
 # RUN yarn config set registry 'https://registry.npm.taobao.org'
 # RUN yarn config set registry 'https://registry.npmjs.org/'
 
@@ -18,4 +19,6 @@ RUN yarn build
 FROM nginx as prod-stage
 RUN mkdir /app
 COPY --from=prod-build /app/dist /app
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY --from=build-stage /app/nginx.conf /app/nginx.conf
+
+CMD ["nginx", "-c", "/app/nginx.conf"]

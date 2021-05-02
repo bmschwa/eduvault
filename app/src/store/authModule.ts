@@ -15,7 +15,7 @@ import {
   utils,
 } from './utils';
 import { ROUTES, URL_API, API_WS, URL_APP } from '../config';
-console.log({ URL_API, URL_APP });
+//console.log({ URL_API, URL_APP });
 // import { connectClient } from '../store/textileHelpers';
 // import localForage from 'localforage';
 import Vue from 'vue';
@@ -214,7 +214,7 @@ export default {
         console.log(err.response);
         if (err.response && err.response.data && err.response.data.message)
           return err.response.data.message;
-        else return 'Issue connecting to database';
+        else return 'Issue connecting to database ('+err.message+')';
       }
     },
 

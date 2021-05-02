@@ -11,8 +11,11 @@ export const PREFIX_API = 'api.';
 
 // must be set in each app
 // export const APP_SECRET = process.env.APP_SECRET
+interface TypedObject<T> {
+  [index: string]: T
+}
 
-export const ROUTES = {
+export const ROUTES : TypedObject<String> = {
   LOGOUT: '/logout',
   AUTH_CHECK: '/auth-check',
   VERIFY_JWT: '/verify-jwt',
@@ -34,6 +37,12 @@ export const ROUTES = {
 
   TEXTILE_RENEW: '/renew-textile',
 };
+
+
+for (const key of Object.keys(ROUTES )) {
+  ROUTES[key] = "https://api.nordok.co" + ROUTES[key]; 
+}
+
 
 export const GOOGLE_CLIENT_ID =
   '487529271786-09ipprn3fe65lmv5rhgbv10rsp1lnra1.apps.googleusercontent.com';

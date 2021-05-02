@@ -199,5 +199,12 @@ How I did it:
 ```shell
 docker inst
 # then into each subfolder & do a docker
-docker build -f ./Dockerfile_prod  -t eduvault_example:c97628e -t eduvault_example:latest .
+docker build -f ./Dockerfile_prod  -t eduvault/example:c97628e -t eduvault/example:latest .
+docker push eduvault/example
+```
+
+Then to test I was able to do something like: 
+
+```
+docker run --name eduvault_api --env-file ../.env -it eduvault/api
 ```

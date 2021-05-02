@@ -1,5 +1,5 @@
 <template>
-  <b-navbar class="navbar__navbar" ref="navbarMain" toggleable="xs" type="dark" variant="secondary">
+  <b-navbar ref="navbarMain" class="navbar__navbar" toggleable="xs" type="dark" variant="secondary">
     <b-navbar-toggle target="nav-collapse" />
 
     <font-awesome-layers v-if="loggedIn" class="nav-icon__layers fa-lg">
@@ -7,7 +7,7 @@
       <font-awesome-icon id="nav-icon__sync" class="fa-xs secondary" :spin="syncing" icon="sync" />
     </font-awesome-layers>
     <b-img height="20px" width="20px" src="/img/icons/flashy-cards-logo-white.svg"></b-img>
-    <b-collapse class="pt-3" id="nav-collapse" is-nav>
+    <b-collapse id="nav-collapse" class="pt-3" is-nav>
       <b-link v-if="$router.currentRoute.name == 'Login'" class="nav__link mt-3" to="/home"
         >Home</b-link
       >

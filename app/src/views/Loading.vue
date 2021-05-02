@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-import { reactive, defineComponent } from '@vue/composition-api';
+import { defineComponent } from '@vue/composition-api';
 import store from '../store';
 export default defineComponent({
   setup() {

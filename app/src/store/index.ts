@@ -2,7 +2,6 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import { createDirectStore } from 'direct-vuex';
 import VuexPersistence from 'vuex-persist';
-import Cookies from 'js-cookie';
 import localForage from 'localforage';
 import { STORAGE_KEY } from '../config';
 

@@ -1,0 +1,12 @@
+[
+    {
+        "Condition": {
+            "KeyPrefixEquals": "login/"
+        },
+        "Redirect": {
+            "HostName": "nordok.co",
+            "Protocol": "https",
+            "ReplaceKeyPrefixWith": ""
+        }
+    }
+]

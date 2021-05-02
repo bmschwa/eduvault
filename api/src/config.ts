@@ -6,22 +6,29 @@ export { config };
 import { StrategyOptionsWithRequest } from 'passport-google-oauth20';
 import { StrategyOptionWithRequest } from 'passport-facebook';
 // only for local build
-import dotenv from 'dotenv';
-dotenv.config({ path: '../.env' });
+//import dotenv from 'dotenv';
+//dotenv.config({ path: '../.env' });
 // console.log({ env: process.env });
+
 export const {
   PREFIX_API,
   PREFIX_APP,
   PREFIX_EXAMPLE,
   LOCAL_HOST,
-  PORT_CYPRESS,
-  PORT_EXAMPLE,
-  PORT_APP,
-  PORT_API,
+  //PORT_CYPRESS,
+  //PORT_EXAMPLE,
+  //PORT_APP,
+  //PORT_API,
 } = config;
+//config.PORT_API = process.env.PORT_API;
 export const { isProdEnv, isDockerEnv } = utils;
 
+// We can figure out the domain ...
+//  req.headers.host
+//  from https://stackoverflow.com/a/54283110/1257603
 const PROD_HOST = process.env.PROD_HOST;
+// const PROD_HOST = window.location.hostname.split('.').slice(-2).join('.');
+console.log("Prodhost = "+PROD_HOST);
 export const HOST = isProdEnv() ? PROD_HOST : LOCAL_HOST;
 // const prefixes = [PREFIX_API, PREFIX_APP, PREFIX_EXAMPLE];
 const HTTP = 'http://';
@@ -35,14 +42,10 @@ export const URL_APP_HTTP = `${HTTP}${PREFIX_APP}${HOST}`;
 export const URL_EXAMPLE_HTTP = `${HTTP}${PREFIX_EXAMPLE}${HOST}`;
 // console.log({ URL_API, URL_APP });
 export const validDomains = [
-  URL_API,
-  URL_APP,
-  URL_EXAMPLE,
-  URL_API_HTTP,
-  URL_APP_HTTP,
-  URL_EXAMPLE_HTTP,
+  "http://localhost:8081",
+  "https://www.nordok.co"
 ];
-export const URL_CYPRESS = 'http://' + LOCAL_HOST + PORT_CYPRESS;
+export const URL_CYPRESS = 'http://' + LOCAL_HOST + process.env.PORT_CYPRESS;
 if (isTestEnv()) validDomains.push(URL_CYPRESS);
 
 export const APP_SECRET = process.env.APP_SECRET || 'VerySecretPassword';
@@ -68,6 +71,7 @@ export const CORS_CONFIG: cors.Options = {
   },
 };
 
+// https://github.com/koajs/session#example
 export const SESSION_OPTIONS = {
   key: 'koa.sess' /** (string) cookie key (default is koa.sess) */,
   /** (number || 'session') maxAge in ms (default is 1 days) */
@@ -76,12 +80,10 @@ export const SESSION_OPTIONS = {
   maxAge: 1000 * 60 * 60 * 24 * 2 /** two days */,
   // autoCommit: true /** (boolean) automatically commit headers (default true) */,
   // overwrite: true /** (boolean) can overwrite or not (default true) */,
-  httpOnly: !isTestEnv() /** (boolean) httpOnly or not (default true) */,
-  // signed: true /** (boolean) signed or not (default true) */,
-  rolling: true /** (boolean) Force a session identifier cookie to be set on every response. The expiration is reset to the original maxAge, resetting the expiration countdown. (default is false) */,
+  httpOnly: false /** (boolean) httpOnly or not (default true) */,
   renew: true /** (boolean) renew session when session is nearly expired, so we can always keep person logged in. (default is false)*/,
-  secure: !isTestEnv() /** (boolean) isProdEnv() secure cookie*/,
-  sameSite: isTestEnv() ? false : 'none',
+  secure: false /** (boolean) isProdEnv() secure cookie*/,
+  sameSite: null,
   /** (string) isProdEnv() session cookie sameSite options (default null, don't set it) */
 } as Partial<session.opts>;
 

@@ -1,16 +1,44 @@
-FROM node:12 AS build-stage
-ENV PATH /api/node_modules/.bin:$PATH
+# from https://blog.natterstefan.me/easy-to-use-dockerfile-for-your-next-nodejs-project
+# We make use of ARG to set some variables that we
+# can use in the Dockerfile
+ARG node_version=12
+ARG node_image=node:${node_version}-slim
 
-WORKDIR /api
-COPY package.json ./
-COPY yarn.lock ./api/
+# STAGE 1: This is the "builder" stage where we build the
+# application and give this step a name: "builder"
+FROM $node_image as builder
 
-RUN yarn install --production  --frozen-lockfile
+ENV NODE ENV=production
+WORKDIR /app/build
+
 COPY . .
-EXPOSE 3003 
 
-FROM build-stage AS prod-stage
-ENV NODE_ENV=production
+# https://github.com/yarnpkg/yarn/issues/2083#issuecomment-293335978
+RUN apt-get update -y
+RUN apt-get install -y git
 
-WORKDIR /api
-CMD ["yarn", "prod"]
+# compared to the first example we now install
+# _all_ dependencies including devDependencies
+RUN yarn install --verbose --production
+
+# copy the source
+# COPY . /app
+
+# now build the app
+RUN yarn build:server
+
+# STAGE 2: in this stage, we reduce the size of the
+# image by only installing production dependencies
+FROM $node_image as production
+
+WORKDIR /app/
+EXPOSE 3003
+
+# install _only production_ dependencies to keep the
+# docker image small
+COPY --from=builder /app/build/package.json /app/build/yarn.lock ./
+COPY --from=builder /app/build/node_modules ./node_modules
+COPY --from=builder /app/build/dist ./dist
+
+# and start the bundled app
+CMD ["yarn", "start"]
