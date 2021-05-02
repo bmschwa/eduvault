@@ -1,6 +1,6 @@
 {
   "name": "@eduvault/app",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "The login page, and user home page for a user-owned database focused on educational technology",
   "main": "index.js",
   "license": "MIT",

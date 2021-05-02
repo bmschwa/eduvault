@@ -67,12 +67,10 @@ app.use(async function handleGeneralError(ctx, next) {
 //if (!isTestEnv()) app.use(sslify({ resolver: xForwardedProtoResolver }));
 
 
+//const testAPI = app;
 
 
 
-const testAPI = app;
-
-*/
 export { newLocalDB, passportInit, routerInit, personAuthRoute };
 
 // Lets try this approach.  specifically; remove nearly all mentions of "app" here and instead set up koa stuff
