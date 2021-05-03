@@ -40,9 +40,6 @@ import { config, CORS_CONFIG, URL_API, URL_APP } from './config';
 import { isTestEnv, utils } from './utils';
 import { clearCollections } from './utils/clearCollections';
 import { populateDB } from './utils/populateDB';
-// import { appSchema } from './models/app';
-// import { personSchema } from './models/person';
-*/
 const k_app = new Koa();
 
 // We should parameterize this to turn logging on and off...
@@ -50,9 +47,6 @@ k_app.use(logging({logger: pino()}));
 
 const app = websockify(k_app);
 app.proxy = true;
-
-//import { isTestEnv, utils } from './utils';
-//const { isProdEnv } = utils;
 
 /** Middlewares */
 app.use(async function handleGeneralError(ctx, next) {
@@ -64,13 +58,6 @@ app.use(async function handleGeneralError(ctx, next) {
   }
 });
 
-//if (!isTestEnv()) app.use(sslify({ resolver: xForwardedProtoResolver }));
-
-
-//const testAPI = app;
-
-
-
 export { newLocalDB, passportInit, routerInit, personAuthRoute };
 
 // Lets try this approach.  specifically; remove nearly all mentions of "app" here and instead set up koa stuff
@@ -78,11 +65,6 @@ export { newLocalDB, passportInit, routerInit, personAuthRoute };
 
 app.use(cookie());
 app.use(cors(CORS_CONFIG));
-
-//if (!isTestEnv()) app.use(sslify({ resolver: xForwardedProtoResolver }));
-
-app.use(cookie());
-
 app.use(bodyParser());
 app.use(helmet());
 app.use(

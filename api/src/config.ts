@@ -21,21 +21,25 @@ export const {
   //PORT_API,
 } = config;
 //config.PORT_API = process.env.PORT_API;
-export const { isProdEnv, isDockerEnv } = utils;
+//export const { isProdEnv, isDockerEnv } = utils;
 
 // We can figure out the domain ...
 //  req.headers.host
 //  from https://stackoverflow.com/a/54283110/1257603
-const PROD_HOST = process.env.PROD_HOST;
-// const PROD_HOST = window.location.hostname.split('.').slice(-2).join('.');
-console.log("Prodhost = "+PROD_HOST);
-export const HOST = isProdEnv() ? PROD_HOST : LOCAL_HOST;
+
+const PROD_HOST_ENV = process.env.PROD_HOST;
+const HOSTNAME_WIN_LOC = window.location.hostname.split('.').slice(-2).join('.');
+
+console.log("PROD_HOST_ENV = "+PROD_HOST_ENV+"; HOSTNAME_WIN_LOC = "+HOSTNAME_WIN_LOC);
+
 // const prefixes = [PREFIX_API, PREFIX_APP, PREFIX_EXAMPLE];
-const HTTP = 'http://';
-const HTTPS = 'https://';
+//const HTTP = 'http://';
+//const HTTPS = 'https://';
 /** https://api.eduvault or https://api.localhost */
 export const URL_API = `${HTTPS}${PREFIX_API}${HOST}`;
 export const URL_APP = `${HTTPS}${PREFIX_APP}${HOST}`;
+
+
 export const URL_EXAMPLE = `${HTTPS}${PREFIX_EXAMPLE}${HOST}`;
 export const URL_API_HTTP = `${HTTP}${PREFIX_API}${HOST}`;
 export const URL_APP_HTTP = `${HTTP}${PREFIX_APP}${HOST}`;
