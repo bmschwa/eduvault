@@ -15,9 +15,11 @@ import {
   utils,
 } from './utils';
 import { ROUTES, URL_API, API_WS, URL_APP } from '../config';
-//console.log({ URL_API, URL_APP });
+console.log("From within auth module: "+{ URL_API, URL_APP });
+
 // import { connectClient } from '../store/textileHelpers';
 // import localForage from 'localforage';
+
 import Vue from 'vue';
 import Vuecookies from 'vue-cookies';
 Vue.use(Vuecookies);
@@ -140,19 +142,23 @@ export default {
           redirectURL: redirectURL,
           appID: appID,
         };
-        // console.log({ loginData });
-
+        
+        console.log("Sending to "+URL_API + ROUTES.PASSWORD_AUTH);
         const options: AxiosRequestConfig = {
           url: URL_API + ROUTES.PASSWORD_AUTH,
           withCredentials: true,
           headers: {
             'Content-Type': 'application/json',
-            'X-Forwarded-Proto': 'https',
+            
+            //'j @ I think this is why we were struggingling with 
+            // with the secure cookie issue?'
+            //'X-Forwarded-Proto': 'https',
           },
           method: 'POST',
           data: loginData,
         };
-
+        
+        // Get a response... may be a while.
         const response = await axios(options);
         const responseData: types.PasswordLoginRes = response.data;
         console.log({ responseHeaders: response.headers });

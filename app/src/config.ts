@@ -19,6 +19,7 @@ export const {
 const PROD_HOST = window.location.hostname.split('.').slice(-2).join('.');
 
 
+ssfsd
 //console.dir(process.env);
 //console.log({ env: process.env });
 //export const { isProdEnv, isDockerEnv } = utils;
@@ -29,8 +30,11 @@ export const HOST = process.env.API_SERVER;
 // const prefixes = [PREFIX_API, PREFIX_APP, PREFIX_EXAMPLE];
 //const HTTP = 'https://';
 //export const URL_API = `${HTTP}${PREFIX_API}${HOST}`;
-export const URL_API = `http://localhost:8082`;
+//export const URL_API = `http://localhost:8082`;
+
+export const URL_API = `https://api.nordok.co`;
 export const URL_APP = `http://localhost:8081`;
+
 //export const URL_EXAMPLE = `${HTTP}${PREFIX_EXAMPLE}${HOST}`;
 export const API_WS = 'wss://' + HOST;
 export const ROUTES = config.ROUTES;
