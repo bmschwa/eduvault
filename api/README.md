@@ -54,5 +54,6 @@ yarn build:server
 ```
 
 
-docker build -f .\Dockerfile_prod -t eduvault/api:latest -t eduvault/api:$(git log -1 --pretty="format:%h")
+docker  build --build-arg COMMIT_SHA=$(git log -1 --pretty="format:%h") -f .\Dockerfile_prod -t eduvault/api:latest -t eduvault/api:$(git log -1 --pretty="format:%h") .
+
 docker push -a eduvault/api

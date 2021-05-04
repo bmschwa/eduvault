@@ -22,8 +22,6 @@ const logging = require('@kasa/koa-logging');
 
 const pino = require('pino');
 /*
-
-
 import sslify, { xForwardedProtoResolver } from 'koa-sslify';
 import ip from 'ip';R
 
@@ -40,15 +38,16 @@ import { config, CORS_CONFIG, URL_API, URL_APP } from './config';
 import { isTestEnv, utils } from './utils';
 import { clearCollections } from './utils/clearCollections';
 import { populateDB } from './utils/populateDB';
+
+Middlewares */
 const k_app = new Koa();
 
 // We should parameterize this to turn logging on and off...
 k_app.use(logging({logger: pino()}));
 
 const app = websockify(k_app);
-app.proxy = true;
 
-/** Middlewares */
+app.proxy = true;
 app.use(async function handleGeneralError(ctx, next) {
   try {
     await next();
@@ -74,7 +73,10 @@ app.use(
         code: status,
         data: payload,
         message: message,
-        debugging: "nonsense @ " + Date.now(),
+        debugging: {
+          "ts": Date.now(),
+          "rev": process.env.COMMIT_SHA
+        }
       };
     },
   }),

@@ -1,44 +1,56 @@
 # from https://blog.natterstefan.me/easy-to-use-dockerfile-for-your-next-nodejs-project
 # We make use of ARG to set some variables that we
+
+# Also https://artsy.github.io/blog/2018/09/10/Dockerhub-Stamping-Commits/ 
+
 # can use in the Dockerfile
 ARG node_version=12
-ARG node_image=node:${node_version}-slim
+ARG node_image=node:${node_version}
+
 
 # STAGE 1: This is the "builder" stage where we build the
 # application and give this step a name: "builder"
-FROM $node_image as builder
+FROM ${node_image}-alpine as builder
 
 ENV NODE ENV=production
 WORKDIR /app/build
 
-COPY . .
+COPY package.json yarn.lock .
 
 # https://github.com/yarnpkg/yarn/issues/2083#issuecomment-293335978
-RUN apt-get update -y
-RUN apt-get install -y git
+# RUN apt-get update
+RUN apk add --update-cache --no-progress git
 
-# compared to the first example we now install
-# _all_ dependencies including devDependencies
-RUN yarn install --verbose --production
+# install all the dependencies
+RUN yarn install
 
-# copy the source
-# COPY . /app
+COPY tsconfig.build.json tsconfig.json ./
+COPY src/ /app/build/src/
 
 # now build the app
 RUN yarn build:server
 
 # STAGE 2: in this stage, we reduce the size of the
 # image by only installing production dependencies
-FROM $node_image as production
+FROM ${node_image}-slim as production
+
+ARG COMMIT_SHA
 
 WORKDIR /app/
 EXPOSE 3003
 
 # install _only production_ dependencies to keep the
 # docker image small
+RUN apt-get update && \
+    apt-get install git -y && \ 
+    apt-get upgrade -y && \
+    apt-get clean
 COPY --from=builder /app/build/package.json /app/build/yarn.lock ./
-COPY --from=builder /app/build/node_modules ./node_modules
+# COPY --from=builder /app/build/node_modules ./node_modules
 COPY --from=builder /app/build/dist ./dist
+RUN yarn install --production
+
+ENV COMMIT_SHA=${COMMIT_SHA}
 
 # and start the bundled app
 CMD ["yarn", "start"]

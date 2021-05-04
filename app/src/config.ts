@@ -18,8 +18,6 @@ export const {
 // const PROD_HOST = process.env.VUE_APP_PROD_HOST;
 const PROD_HOST = window.location.hostname.split('.').slice(-2).join('.');
 
-
-ssfsd
 //console.dir(process.env);
 //console.log({ env: process.env });
 //export const { isProdEnv, isDockerEnv } = utils;

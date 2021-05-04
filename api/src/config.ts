@@ -28,23 +28,23 @@ export const {
 //  from https://stackoverflow.com/a/54283110/1257603
 
 const PROD_HOST_ENV = process.env.PROD_HOST;
-const HOSTNAME_WIN_LOC = window.location.hostname.split('.').slice(-2).join('.');
+//const HOSTNAME_WIN_LOC = window.location.hostname.split('.').slice(-2).join('.');
 
-console.log("PROD_HOST_ENV = "+PROD_HOST_ENV+"; HOSTNAME_WIN_LOC = "+HOSTNAME_WIN_LOC);
+console.log("PROD_HOST_ENV = "+PROD_HOST_ENV);
 
 // const prefixes = [PREFIX_API, PREFIX_APP, PREFIX_EXAMPLE];
 //const HTTP = 'http://';
 //const HTTPS = 'https://';
 /** https://api.eduvault or https://api.localhost */
-export const URL_API = `${HTTPS}${PREFIX_API}${HOST}`;
-export const URL_APP = `${HTTPS}${PREFIX_APP}${HOST}`;
+export const URL_API = `https://api.nordok.co`;
+export const URL_APP = `https://nordok.co`;
 
 
-export const URL_EXAMPLE = `${HTTPS}${PREFIX_EXAMPLE}${HOST}`;
+/*export const URL_EXAMPLE = `${HTTPS}${PREFIX_EXAMPLE}${HOST}`;
 export const URL_API_HTTP = `${HTTP}${PREFIX_API}${HOST}`;
 export const URL_APP_HTTP = `${HTTP}${PREFIX_APP}${HOST}`;
 export const URL_EXAMPLE_HTTP = `${HTTP}${PREFIX_EXAMPLE}${HOST}`;
-// console.log({ URL_API, URL_APP });
+// console.log({ URL_API, URL_APP });*/
 export const validDomains = [
   "http://localhost:8081",
   "https://www.nordok.co"
@@ -53,7 +53,7 @@ export const URL_CYPRESS = 'http://' + LOCAL_HOST + process.env.PORT_CYPRESS;
 if (isTestEnv()) validDomains.push(URL_CYPRESS);
 
 export const APP_SECRET = process.env.APP_SECRET || 'VerySecretPassword';
-if (isProdEnv() && APP_SECRET === 'VerySecretPassword') {
+if (APP_SECRET === 'VerySecretPassword') {
   throw new Error('APP_SECRET missing in production');
 }
 
