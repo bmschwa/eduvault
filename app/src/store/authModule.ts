@@ -148,6 +148,7 @@ export default {
           url: URL_API + ROUTES.PASSWORD_AUTH,
           withCredentials: true,
           headers: {
+            Accept: 'application/json',
             'Content-Type': 'application/json',
             
             //'j @ I think this is why we were struggingling with 
