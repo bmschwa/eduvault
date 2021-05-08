@@ -6,3 +6,6 @@ expiry will renew on every request
 
 jwt renewal policy:
 JWT lasts for 30 days. Renew only after a day (>29 left). send back new and old jwt, in case they need the old jwt to unlock keys.
+
+-- 5/8/2021:
+ - 11d5c94: was having a problem accessing the header

@@ -61,6 +61,7 @@ export const ROUTES = config.ROUTES;
 
 export const CORS_CONFIG: cors.Options = {
   credentials: true,
+  exposeHeaders: ['set-cookie'],
   origin: (ctx) => {
     console.log(
       '===================================ctx.request.header.origin===================================\n',
