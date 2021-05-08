@@ -40,6 +40,12 @@ const getDefaultState = () => {
   return defaultState;
 };
 
+// https://forum.vuejs.org/t/problems-setting-session-cookies/4717/7
+// Also ... https://stackoverflow.com/questions/54520226/set-withcredentials-globally-with-axios-on-vuejs
+// 
+// didn't seem to do anything
+//axios.defaults.withCredentials = true;
+
 export default {
   namespaced: true as const,
   state: getDefaultState(),
@@ -148,19 +154,36 @@ export default {
           url: URL_API + ROUTES.PASSWORD_AUTH,
           withCredentials: true,
           headers: {
-            Accept: 'application/json',
+            'Accept': 'application/json',
             'Content-Type': 'application/json',
             
             //'j @ I think this is why we were struggingling with 
             // with the secure cookie issue?'
-            //'X-Forwarded-Proto': 'https',
+            'X-Forwarded-Proto': 'https',
           },
           method: 'POST',
           data: loginData,
         };
         
         // Get a response... may be a while.
-        const response = await axios(options);
+        /// I think this call is the issue.  Its not setting up the way I expected
+        //const response = await axios(options);
+        const response = await axios.post(URL_API + ROUTES.PASSWORD_AUTH, 
+          loginData,
+          {
+            headers: {
+              // 'application/json' is the modern content-type for JSON, but some
+              // older servers may use 'text/json'.
+              // See: http://bit.ly/text-json
+              'content-type': 'application/json',
+              'X-Forwarded-Proto': 'https',
+              'credentials': true
+            }
+          });
+
+
+
+
         const responseData: types.PasswordLoginRes = response.data;
         console.log({ responseHeaders: response.headers });
         console.log('login cookie: ' + JSON.stringify(Vue.$cookies.get('koa.sess')));

@@ -64,8 +64,9 @@ export const CORS_CONFIG: cors.Options = {
   origin: (ctx) => {
     console.log(
       '===================================ctx.request.header.origin===================================\n',
-
-      { nodeENV: process.env.NODE_ENV, validDomains, headersOrigin: ctx.request.header.origin },
+      // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Expose-Headers
+      
+      { nodeENV: process.env.NODE_ENV, validDomains, headersOrigin: ctx.request.header.origin, exposeHeaders: ['set-cookie']},
     );
     if (validDomains.indexOf(ctx.request.header.origin) !== -1) {
       // console.log('\n is valid domain');
@@ -75,6 +76,10 @@ export const CORS_CONFIG: cors.Options = {
   },
 };
 
+const SESSION_HTTPONLY : boolean = process.env.SESSSION_HTTPONLY == null ? false : process.env.SESSION_HTTPONLY === 'true';
+const SESSION_RENEW: boolean = process.env.SESSSION_RENEW == null ? false : process.env.SESSION_RENEW === 'true';
+const SESSION_SECURE: boolean = process.env.SESSION_SECURE ==  null ? false : process.env.SESSION_SECURE === 'true';
+const SESSION_SAMESITE: boolean = process.env.SESSION_SAMESITE == null ? false: process.env.SESSION_SAMESITE === 'true';
 // https://github.com/koajs/session#example
 export const SESSION_OPTIONS = {
   key: 'koa.sess' /** (string) cookie key (default is koa.sess) */,
@@ -83,12 +88,11 @@ export const SESSION_OPTIONS = {
   /** Warning: If a session cookie is stolen, this cookie will never expire */
   maxAge: 1000 * 60 * 60 * 24 * 2 /** two days */,
   // autoCommit: true /** (boolean) automatically commit headers (default true) */,
-  // overwrite: true /** (boolean) can overwrite or not (default true) */,
-  httpOnly: false /** (boolean) httpOnly or not (default true) */,
-  renew: true /** (boolean) renew session when session is nearly expired, so we can always keep person logged in. (default is false)*/,
-  secure: false /** (boolean) isProdEnv() secure cookie*/,
-  sameSite: null,
-  /** (string) isProdEnv() session cookie sameSite options (default null, don't set it) */
+  // overwrite: true /** (boolean) can overwrite or not (default true) */
+  httpOnly: SESSION_HTTPONLY, /** (boolean) httpOnly or not (default true) */
+  renew: SESSION_RENEW, /** (boolean) renew session when session is nearly expired, so we can always keep person logged in. (default is false)*/
+  secure: SESSION_SECURE,
+  sameSite: SESSION_SAMESITE,
 } as Partial<session.opts>;
 
 /** expressed in seconds or a string describing a time span zeit/ms. Eg: 60, "2 days", "10h", "7d" */

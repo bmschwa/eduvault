@@ -19,11 +19,14 @@ import {
   faCloud,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon, FontAwesomeLayers } from '@fortawesome/vue-fontawesome';
+
+
 library.add(faTrashAlt, faPlusSquare, faCheck, faEdit, faTimes, faSpinner, faSync, faCloud);
 
 Vue.component('FontAwesomeIcon', FontAwesomeIcon);
 Vue.component('FontAwesomeLayers', FontAwesomeLayers);
-Vue.config.productionTip = false;
+// Vue.config.productionTip = false;
+
 
 import VueCompositionApi from '@vue/composition-api';
 
